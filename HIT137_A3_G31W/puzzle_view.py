@@ -23,7 +23,6 @@ class PuzzleView:
         self.create_image_area()
         self.draw_grid_lines()
         
-        
     def create_controls(self):
         control_frame = tk.Frame(self.root)
         control_frame.pack(pady=10)
@@ -252,6 +251,12 @@ class PuzzleView:
     def clear_hint_circles(self):
         self.puzzle_canvas.delete("hint_circle")
         self.original_canvas.delete("hint_circle") 
+    
+    def update_moves(self, move_count):
+        self.moves.set(f"Moves: {move_count}")
+
+    def update_tiles_left(self, count):
+        self.tiles_left.set(f"Tiles Left: {count}")
                        
     def show_hint(self):
         print("Hint Clicked")
