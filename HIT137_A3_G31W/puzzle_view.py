@@ -21,7 +21,7 @@ class PuzzleView:
         
         self.create_controls()
         self.create_image_area()
-        
+        self.draw_grid_lines()
         
     def create_controls(self):
         control_frame = tk.Frame(self.root)
@@ -35,7 +35,8 @@ class PuzzleView:
             self.grid_size,
             "3x3",
             "4x4",
-            "5x5"
+            "5x5",
+            command=self.grid_changed
         )
         grid_menu.pack(side="left", padx=5)
         select_button = tk.Button(
@@ -136,7 +137,35 @@ class PuzzleView:
             image=self.original_photo,
             anchor="center"
         )
-        
+    
+    def draw_grid_lines(self):
+        self.puzzle_canvas.delete("grid_line")
+
+        grid_number = int(self.grid_size.get()[0])
+        tile_size = 500 / grid_number
+
+        for i in range(1, grid_number):
+            position = i * tile_size
+
+            self.puzzle_canvas.create_line(
+                position, 0,
+                position, 500,
+                fill="gray",
+                width=1,
+                tags="grid_line"
+            )
+
+            self.puzzle_canvas.create_line(
+                0, position,
+                500, position,
+                fill="gray",
+                width=1,
+                tags="grid_line"
+            )
+    
+    def grid_changed(self, choice):
+        self.draw_grid_lines()
+         
     def show_hint(self):
         print("Hint Clicked")
         
