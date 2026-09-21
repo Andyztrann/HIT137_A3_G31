@@ -22,6 +22,8 @@ class PuzzleView:
         self.create_controls()
         self.create_image_area()
         self.draw_grid_lines()
+        self.draw_correct_tick(0, 0)
+        self.draw_correct_tick(1, 1)
         self.highlight_selected_tile(1, 1)
         
     def create_controls(self):
@@ -192,7 +194,23 @@ class PuzzleView:
     
     def clear_selection_highlight(self):
         self.puzzle_canvas.delete("selection")
-                 
+    
+    def draw_correct_tick(self, row, column):
+        grid_number = int(self.grid_size.get()[0])
+        tile_size = 500 / grid_number
+
+        x = (column + 1) * tile_size - 15
+        y = row * tile_size + 15
+
+        self.puzzle_canvas.create_text(
+            x,
+            y,
+            text="✓",
+            fill="green",
+            font=("Arial", 18, "bold"),
+            tags="correct_tick"
+        )
+                    
     def show_hint(self):
         print("Hint Clicked")
         
