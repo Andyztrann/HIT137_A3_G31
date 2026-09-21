@@ -22,9 +22,7 @@ class PuzzleView:
         self.create_controls()
         self.create_image_area()
         self.draw_grid_lines()
-        self.draw_correct_tick(0, 0)
-        self.draw_correct_tick(1, 1)
-        self.highlight_selected_tile(1, 1)
+        
         
     def create_controls(self):
         control_frame = tk.Frame(self.root)
@@ -169,6 +167,8 @@ class PuzzleView:
     
     
     def grid_changed(self, choice):
+        self.clear_selection_highlight()
+        self.clear_correct_ticks()
         self.draw_grid_lines()
         
     def highlight_selected_tile(self, row, column):
@@ -210,7 +210,49 @@ class PuzzleView:
             font=("Arial", 18, "bold"),
             tags="correct_tick"
         )
-                    
+    
+    def clear_correct_ticks(self):
+        self.puzzle_canvas.delete("correct_tick")
+    
+    def draw_hint_circles(self, current_row, current_column,
+                      home_row, home_column):
+
+        self.clear_hint_circles()
+
+        grid_number = int(self.grid_size.get()[0])
+        tile_size = 500 / grid_number
+
+        current_x = current_column * tile_size + tile_size / 2
+        current_y = current_row * tile_size + tile_size / 2
+
+        home_x = home_column * tile_size + tile_size / 2
+        home_y = home_row * tile_size + tile_size / 2
+
+        radius = 15
+
+        self.puzzle_canvas.create_oval(
+            current_x - radius,
+            current_y - radius,
+            current_x + radius,
+            current_y + radius,
+            outline="blue",
+            width=3,
+            tags="hint_circle"
+        )
+
+        self.original_canvas.create_oval(
+            home_x - radius,
+            home_y - radius,
+            home_x + radius,
+            home_y + radius,
+            outline="blue",
+            width=3,
+            tags="hint_circle"
+        )
+    def clear_hint_circles(self):
+        self.puzzle_canvas.delete("hint_circle")
+        self.original_canvas.delete("hint_circle") 
+                       
     def show_hint(self):
         print("Hint Clicked")
         
