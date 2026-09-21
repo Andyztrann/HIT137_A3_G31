@@ -22,6 +22,7 @@ class PuzzleView:
         self.create_controls()
         self.create_image_area()
         self.draw_grid_lines()
+        self.highlight_selected_tile(1, 1)
         
     def create_controls(self):
         control_frame = tk.Frame(self.root)
@@ -163,9 +164,35 @@ class PuzzleView:
                 tags="grid_line"
             )
     
+    
+    
     def grid_changed(self, choice):
         self.draw_grid_lines()
-         
+        
+    def highlight_selected_tile(self, row, column):
+        self.puzzle_canvas.delete("selection")
+
+        grid_number = int(self.grid_size.get()[0])
+        tile_size = 500 / grid_number
+
+        x1 = column * tile_size
+        y1 = row * tile_size
+        x2 = x1 + tile_size
+        y2 = y1 + tile_size
+
+        self.puzzle_canvas.create_rectangle(
+            x1,
+            y1,
+            x2,
+            y2,
+            outline="green",
+            width=4,
+            tags="selection"
+        )
+    
+    def clear_selection_highlight(self):
+        self.puzzle_canvas.delete("selection")
+                 
     def show_hint(self):
         print("Hint Clicked")
         
