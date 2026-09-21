@@ -119,6 +119,9 @@ class PuzzleView:
 
         if file_path:
             self.selected_image_path = file_path
+            
+            self.reset_view()
+            
             print("Selected image:", file_path)
             self.display_original_image(file_path)
             
@@ -257,6 +260,17 @@ class PuzzleView:
 
     def update_tiles_left(self, count):
         self.tiles_left.set(f"Tiles Left: {count}")
+    
+    def reset_view(self):
+        self.update_moves(0)
+        self.update_tiles_left(0)
+
+        self.clear_selection_highlight()
+        self.clear_correct_ticks()
+        self.clear_hint_circles()
+
+        self.puzzle_canvas.delete("all")
+        self.draw_grid_lines()
                        
     def show_hint(self):
         print("Hint Clicked")
