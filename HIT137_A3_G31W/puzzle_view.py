@@ -38,12 +38,12 @@ class PuzzleView:
             "5x5"
         )
         grid_menu.pack(side="left", padx=5)
-        load_button = tk.Button(
+        select_button = tk.Button(
             control_frame,
-            text="Load Image",
-            command=self.load_image
+            text="Select Photo",
+            command=self.select_photo
         )
-        load_button.pack(side="left", padx=5)
+        select_button.pack(side="left", padx=5)
         
         hint_button = tk.Button(
             control_frame,
@@ -105,7 +105,7 @@ class PuzzleView:
         )
         self.puzzle_canvas.grid(row=1, column=1, padx=20,pady=10)
     
-    def load_image(self):
+    def select_photo(self):
         file_path = filedialog.askopenfilename(
             title="Select an Image",
             filetypes=[
