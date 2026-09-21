@@ -5,6 +5,7 @@
 
 import tkinter as tk
 from tkinter import filedialog
+from PIL import Image, ImageTk
 
 class PuzzleView:
     def __init__(self, root):
@@ -15,7 +16,8 @@ class PuzzleView:
         self.grid_size = tk.StringVar(value="3x3")
         self.moves = tk.StringVar(value="Moves: 0")
         self.tiles_left = tk.StringVar(value="Tiles Left: 0")
-        self.seelected_image_path = None
+        self.selected_image_path = None
+        self.original_photo = None
         
         self.create_controls()
         self.create_image_area()
@@ -117,6 +119,23 @@ class PuzzleView:
         if file_path:
             self.selected_image_path = file_path
             print("Selected image:", file_path)
+            self.display_original_image(file_path)
+            
+    def display_original_image(self, file_path):
+        image = Image.open(file_path)
+        
+        image.thumbnail((500, 500))
+        
+        self.original_photo = ImageTk.PhotoImage(image)
+        
+        self.original_canvas.delete("all")
+        
+        self.original_canvas.create_image(
+            250,
+            250,
+            image=self.original_photo,
+            anchor="center"
+        )
         
     def show_hint(self):
         print("Hint Clicked")
