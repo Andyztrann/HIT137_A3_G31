@@ -4,6 +4,7 @@
 # Actual implementation will be added by Naro.
 
 import tkinter as tk
+from tkinter import filedialog
 
 class PuzzleView:
     def __init__(self, root):
@@ -14,6 +15,7 @@ class PuzzleView:
         self.grid_size = tk.StringVar(value="3x3")
         self.moves = tk.StringVar(value="Moves: 0")
         self.tiles_left = tk.StringVar(value="Tiles Left: 0")
+        self.seelected_image_path = None
         
         self.create_controls()
         self.create_image_area()
@@ -102,7 +104,19 @@ class PuzzleView:
         self.puzzle_canvas.grid(row=1, column=1, padx=20,pady=10)
     
     def load_image(self):
-        print("Load Image clicked")
+        file_path = filedialog.askopenfilename(
+            title="Select an Image",
+            filetypes=[
+                ("Image Files", "*.jpg *.jpeg *.png *.bmp"),
+                ("JPEG Files", "*.jpg *.jpeg"),
+                ("PNG Files", "*.png"),
+                ("BMP Files", "*.bmp")
+            ]
+        )
+
+        if file_path:
+            self.selected_image_path = file_path
+            print("Selected image:", file_path)
         
     def show_hint(self):
         print("Hint Clicked")
