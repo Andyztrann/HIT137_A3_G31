@@ -18,6 +18,7 @@ class PuzzleView:
         self.tiles_left = tk.StringVar(value="Tiles Left: 0")
         self.selected_image_path = None
         self.original_photo = None
+        self.puzzle_photo = None
         
         self.create_controls()
         self.create_image_area()
@@ -94,7 +95,7 @@ class PuzzleView:
             image_frame,
             width=500,
             height=500,
-            bg="lightblue"
+            bg="lightgrey"
         )
         self.original_canvas.grid(row=1, column=0, padx=20, pady=10)
         
@@ -102,7 +103,7 @@ class PuzzleView:
             image_frame,
             width=500,
             height=500,
-            bg="lightblue"
+            bg="lightgrey"
         )
         self.puzzle_canvas.grid(row=1, column=1, padx=20,pady=10)
     
@@ -189,7 +190,7 @@ class PuzzleView:
             y1,
             x2,
             y2,
-            outline="green",
+            outline="red",
             width=4,
             tags="selection"
         )
@@ -270,6 +271,22 @@ class PuzzleView:
         self.clear_hint_circles()
 
         self.puzzle_canvas.delete("all")
+        self.draw_grid_lines()
+    
+    def display_puzzle_image(self, image):
+        image.thumbnail((500, 500))
+
+        self.puzzle_photo = ImageTk.PhotoImage(image)
+
+        self.puzzle_canvas.delete("all")
+
+        self.puzzle_canvas.create_image(
+            250,
+            250,
+            image=self.puzzle_photo,
+            anchor="center"
+        )
+
         self.draw_grid_lines()
                        
     def show_hint(self):
