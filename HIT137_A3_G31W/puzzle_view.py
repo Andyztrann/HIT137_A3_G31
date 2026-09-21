@@ -4,8 +4,8 @@
 # Actual implementation will be added by Naro.
 
 import tkinter as tk
-from tkinter import filedialog
-from PIL import Image, ImageTk
+from tkinter import filedialog, messagebox
+from PIL import Image, ImageTk, UnidentifiedImageError
 
 class PuzzleView:
     def __init__(self, root):
@@ -19,10 +19,12 @@ class PuzzleView:
         self.selected_image_path = None
         self.original_photo = None
         self.puzzle_photo = None
+       
         
         self.create_controls()
         self.create_image_area()
         self.draw_grid_lines()
+        self.set_hint_enabled(False)
         
     def create_controls(self):
         control_frame = tk.Frame(self.root)
@@ -39,6 +41,7 @@ class PuzzleView:
             "5x5",
             command=self.grid_changed
         )
+        
         grid_menu.pack(side="left", padx=5)
         select_button = tk.Button(
             control_frame,
@@ -47,19 +50,19 @@ class PuzzleView:
         )
         select_button.pack(side="left", padx=5)
         
-        hint_button = tk.Button(
+        self.hint_button = tk.Button(
             control_frame,
             text="Hint",
             command=self.show_hint
         )
-        hint_button.pack(side="left", padx=5)
+        self.hint_button.pack(side="left", padx=5)
         
-        solve_button = tk.Button(
+        self.solve_button = tk.Button(
             control_frame,
             text="Solve",
             command=self.solve_puzzle
         )
-        solve_button.pack(side="left", padx=5)
+        self.solve_button.pack(side="left", padx=5)
         
         moves_label = tk.Label(
             control_frame,
@@ -117,31 +120,43 @@ class PuzzleView:
                 ("BMP Files", "*.bmp")
             ]
         )
-
         if file_path:
             self.selected_image_path = file_path
-            
+
             self.reset_view()
-            
+
             print("Selected image:", file_path)
-            self.display_original_image(file_path)
-            
+
+            if self.display_original_image(file_path):
+                self.set_hint_enabled(True)
+                
     def display_original_image(self, file_path):
-        image = Image.open(file_path)
-        
-        image.thumbnail((500, 500))
-        
-        self.original_photo = ImageTk.PhotoImage(image)
-        
-        self.original_canvas.delete("all")
-        
-        self.original_canvas.create_image(
-            250,
-            250,
-            image=self.original_photo,
-            anchor="center"
-        )
-    
+        try:
+            image = Image.open(file_path)
+
+            image.thumbnail((500, 500))
+
+            self.original_photo = ImageTk.PhotoImage(image)
+
+            self.original_canvas.delete("all")
+
+            self.original_canvas.create_image(
+                250,
+                250,
+                image=self.original_photo,
+                anchor="center"
+            )
+            
+            return True
+            
+        except (UnidentifiedImageError, OSError):
+            messagebox.showerror(
+                "Invalid Image",
+                "The selected file could not be opened as an image."
+            )
+
+            return False
+
     def draw_grid_lines(self):
         self.puzzle_canvas.delete("grid_line")
 
@@ -167,11 +182,10 @@ class PuzzleView:
                 tags="grid_line"
             )
     
-    
-    
     def grid_changed(self, choice):
         self.clear_selection_highlight()
         self.clear_correct_ticks()
+        self.clear_hint_circles()
         self.draw_grid_lines()
         
     def highlight_selected_tile(self, row, column):
@@ -265,7 +279,8 @@ class PuzzleView:
     def reset_view(self):
         self.update_moves(0)
         self.update_tiles_left(0)
-
+        self.set_hint_enabled(False)
+        
         self.clear_selection_highlight()
         self.clear_correct_ticks()
         self.clear_hint_circles()
@@ -295,6 +310,18 @@ class PuzzleView:
     def solve_puzzle(self):
         print("Solve Clicked")
         
+    def set_hint_enabled(self, enabled):
+        if enabled:
+            self.hint_button.config(state="normal")
+        else:
+            self.hint_button.config(state="disabled")
+    
+    def show_completion_message(self):
+        messagebox.showinfo(
+            "Puzzle Complete",
+            "Congratulations! You completed the puzzle."
+    )       
+            
 if __name__ == "__main__":
     root = tk.Tk()
     view = PuzzleView(root)
