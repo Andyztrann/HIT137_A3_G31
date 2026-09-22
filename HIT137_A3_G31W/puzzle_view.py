@@ -290,7 +290,9 @@ class PuzzleView:
 
         self.puzzle_canvas.delete("all")
         self.draw_grid_lines()
-    
+
+        self.enable_puzzle_input()
+        
     def display_puzzle_image(self, image):
         image.thumbnail((500, 500))
 
@@ -316,6 +318,17 @@ class PuzzleView:
     def puzzle_shift_click(self, event):
         print("Shift + left click:", event.x, event.y)
         return "break"
+    
+    def disable_puzzle_input(self):
+        self.puzzle_canvas.unbind("<Button-1>")
+        self.puzzle_canvas.unbind("<Button-3>")
+        self.puzzle_canvas.unbind("<Shift-Button-1>")
+
+
+    def enable_puzzle_input(self):
+        self.puzzle_canvas.bind("<Button-1>", self.puzzle_left_click)
+        self.puzzle_canvas.bind("<Button-3>", self.puzzle_right_click)
+        self.puzzle_canvas.bind("<Shift-Button-1>", self.puzzle_shift_click)
                    
     def show_hint(self):
         print("Hint Clicked")
