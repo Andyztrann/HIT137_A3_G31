@@ -109,7 +109,10 @@ class PuzzleView:
             bg="lightgrey"
         )
         self.puzzle_canvas.grid(row=1, column=1, padx=20,pady=10)
-    
+        self.puzzle_canvas.bind("<Button-1>", self.puzzle_left_click)
+        self.puzzle_canvas.bind("<Button-3>", self.puzzle_right_click)
+        self.puzzle_canvas.bind("<Shift-Button-1>", self.puzzle_shift_click)
+        
     def select_photo(self):
         file_path = filedialog.askopenfilename(
             title="Select an Image",
@@ -303,7 +306,17 @@ class PuzzleView:
         )
 
         self.draw_grid_lines()
-                       
+    
+    def puzzle_left_click(self, event):
+        print("Left click:", event.x, event.y)
+
+    def puzzle_right_click(self, event):
+        print("Right click:", event.x, event.y)
+
+    def puzzle_shift_click(self, event):
+        print("Shift + left click:", event.x, event.y)
+        return "break"
+                   
     def show_hint(self):
         print("Hint Clicked")
         
