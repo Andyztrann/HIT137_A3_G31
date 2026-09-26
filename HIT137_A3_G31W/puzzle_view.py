@@ -7,7 +7,9 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk, UnidentifiedImageError
 
+#Main GUI for puzzle game
 class PuzzleView:
+    # Set up main window and GUI components
     def __init__(self, root):
         self.root = root
         self.root.title("Image Puzzle Game")
@@ -25,7 +27,8 @@ class PuzzleView:
         self.create_image_area()
         self.draw_grid_lines()
         self.set_hint_enabled(False)
-        
+    
+    # Create control area grid size, buttons and counters    
     def create_controls(self):
         control_frame = tk.Frame(self.root)
         control_frame.pack(pady=10)
@@ -76,6 +79,7 @@ class PuzzleView:
         )
         tiles_label.pack(side="left", padx=5)
     
+    # Create two canvas
     def create_image_area(self):
         image_frame = tk.Frame(self.root)
         image_frame.pack(pady=20)
@@ -112,7 +116,9 @@ class PuzzleView:
         self.puzzle_canvas.bind("<Button-1>", self.puzzle_left_click)
         self.puzzle_canvas.bind("<Button-3>", self.puzzle_right_click)
         self.puzzle_canvas.bind("<Shift-Button-1>", self.puzzle_shift_click)
-        
+    
+    
+    # Open file dialog    
     def select_photo(self):
         file_path = filedialog.askopenfilename(
             title="Select an Image",
@@ -132,7 +138,8 @@ class PuzzleView:
 
             if self.display_original_image(file_path):
                 self.set_hint_enabled(True)
-                
+    
+    # Display the selected image            
     def display_original_image(self, file_path):
         try:
             image = Image.open(file_path)
@@ -160,6 +167,7 @@ class PuzzleView:
 
             return False
 
+    # Draw grid lines on the puzzle canvas
     def draw_grid_lines(self):
         self.puzzle_canvas.delete("grid_line")
 
@@ -185,12 +193,14 @@ class PuzzleView:
                 tags="grid_line"
             )
     
+    # Refresh puzzle and clear previous visual 
     def grid_changed(self, choice):
         self.clear_selection_highlight()
         self.clear_correct_ticks()
         self.clear_hint_circles()
         self.draw_grid_lines()
-        
+    
+    # Draw a red border around the puzzle tile   
     def highlight_selected_tile(self, row, column):
         self.puzzle_canvas.delete("selection")
 
@@ -212,9 +222,11 @@ class PuzzleView:
             tags="selection"
         )
     
+    # Remove the selected tile border
     def clear_selection_highlight(self):
         self.puzzle_canvas.delete("selection")
     
+    # Display a green tick on a tile
     def draw_correct_tick(self, row, column):
         grid_number = int(self.grid_size.get()[0])
         tile_size = 500 / grid_number
@@ -231,9 +243,11 @@ class PuzzleView:
             tags="correct_tick"
         )
     
+    # Remove all green correct-tile ticks from the puzzle
     def clear_correct_ticks(self):
         self.puzzle_canvas.delete("correct_tick")
     
+    # Draw blue hint circles on the current tile
     def draw_hint_circles(self, current_row, current_column,
                       home_row, home_column):
 
@@ -269,16 +283,21 @@ class PuzzleView:
             width=3,
             tags="hint_circle"
         )
+        
+    # Remove the blue hint circles    
     def clear_hint_circles(self):
         self.puzzle_canvas.delete("hint_circle")
         self.original_canvas.delete("hint_circle") 
     
+    # Update the number of moves shown on the GUI
     def update_moves(self, move_count):
         self.moves.set(f"Moves: {move_count}")
 
+    # Update the number of incorrect tiles remaining
     def update_tiles_left(self, count):
         self.tiles_left.set(f"Tiles Left: {count}")
     
+    # Reset counters and visual feedback when starting a new puzzle
     def reset_view(self):
         self.update_moves(0)
         self.update_tiles_left(0)
@@ -292,7 +311,8 @@ class PuzzleView:
         self.draw_grid_lines()
 
         self.enable_puzzle_input()
-        
+    
+    # Display the transformed puzzle image on the puzzle canvas    
     def display_puzzle_image(self, image):
         image.thumbnail((500, 500))
 
@@ -309,45 +329,54 @@ class PuzzleView:
 
         self.draw_grid_lines()
     
+    # Detect a normal left click on the puzzle canvas
     def puzzle_left_click(self, event):
         print("Left click:", event.x, event.y)
 
+    # Detect a right click on the puzzle canvas
     def puzzle_right_click(self, event):
         print("Right click:", event.x, event.y)
 
+    # Detect Shift + left click on the puzzle canvas
     def puzzle_shift_click(self, event):
         print("Shift + left click:", event.x, event.y)
         return "break"
     
+    # Stop the player from interacting with the puzzle canvas
     def disable_puzzle_input(self):
         self.puzzle_canvas.unbind("<Button-1>")
         self.puzzle_canvas.unbind("<Button-3>")
         self.puzzle_canvas.unbind("<Shift-Button-1>")
 
-
+    # Allow puzzle mouse controls to work again
     def enable_puzzle_input(self):
         self.puzzle_canvas.bind("<Button-1>", self.puzzle_left_click)
         self.puzzle_canvas.bind("<Button-3>", self.puzzle_right_click)
         self.puzzle_canvas.bind("<Shift-Button-1>", self.puzzle_shift_click)
-                   
+    
+    # Temporary Hint button action until it is connected to the controller               
     def show_hint(self):
         print("Hint Clicked")
-        
+    
+    # Temporary Solve button action until it is connected to the controller    
     def solve_puzzle(self):
         print("Solve Clicked")
-        
+    
+    # Enable or disable the Hint button    
     def set_hint_enabled(self, enabled):
         if enabled:
             self.hint_button.config(state="normal")
         else:
             self.hint_button.config(state="disabled")
     
+    # Show a message box when the player completes the puzzle
     def show_completion_message(self):
         messagebox.showinfo(
             "Puzzle Complete",
             "Congratulations! You completed the puzzle."
     )       
-            
+
+# Run this file directly for standalone GUI testing            
 if __name__ == "__main__":
     root = tk.Tk()
     view = PuzzleView(root)
