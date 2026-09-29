@@ -92,6 +92,7 @@ def main():
         puzzle_image = convert_image(puzzle)
 
         view.display_puzzle_image(puzzle_image)
+        view.clear_hint_circles()
 
         # Draw green ticks on correctly placed tiles.
         view.clear_correct_ticks()
