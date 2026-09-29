@@ -1,4 +1,4 @@
-class PuzzleModel:
+class PuzzleModel:"""Stores and manages the current puzzle state."""
 
     def __init__(self, grid_size=3):
 
@@ -10,6 +10,7 @@ class PuzzleModel:
         self.original_image = None
 
     def load_puzzle(self, original_image, tiles):
+        """Store the original image and puzzle tiles."""
 
         expected_tiles = self.grid_size ** 2
 
@@ -22,6 +23,7 @@ class PuzzleModel:
         self.original_image = original_image.copy()
         self.tiles = tiles
     def get_tile(self, row, col):
+        """Return the tile currently located at a grid position."""
 
         for tile in self.tiles:
 
@@ -33,6 +35,7 @@ class PuzzleModel:
 
         return None
     def swap_tiles(self, first_tile, second_tile):
+        """Swap the current positions of two tiles."""
 
         if first_tile is second_tile:
             return
@@ -54,6 +57,7 @@ class PuzzleModel:
         )
 
     def count_incorrect(self):
+        """Return the number of tiles that are currently incorrect."""
 
         count = 0
 
@@ -63,6 +67,7 @@ class PuzzleModel:
 
         return count
     def is_solved(self):
+        """Return True when every tile is correct."""
 
         if not self.tiles:
             return False
