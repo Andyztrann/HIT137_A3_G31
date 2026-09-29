@@ -4,8 +4,10 @@ import numpy as np
 
 from tile import Tile
 
-class ImageProcessor:
+class ImageProcessor: 
+    """Handles image loading, resizing, splitting and rebuilding."""
     def load_image(self, file_path):
+        """Load an image from disk using OpenCV."""
         image = cv2.imread(file_path)
 
         if image is None:
@@ -13,6 +15,7 @@ class ImageProcessor:
         return image
 
     def prepare_image(self, image, grid_size, max_size = 600):
+        """Resize and pad an image so it fits the selected grid."""
         if grid_size not in (3, 4, 5):
             raise ValueError("Grid size must be 3, 4, or 5!!")
         height, width = image.shape[:2]
@@ -48,6 +51,7 @@ class ImageProcessor:
         return prepared
 
     def split_image(self, image, grid_size):
+        """Split the prepared image into Tile objects."""
         height, width = image.shape[:2]
 
         if height % grid_size != 0:
@@ -75,7 +79,7 @@ class ImageProcessor:
         return tiles
     
     def rebuild_image(self, tiles, grid_size):
-
+        """Rebuild a complete image from the current tile positions."""
         if not tiles:
             raise ValueError("No tiles available.")
 
