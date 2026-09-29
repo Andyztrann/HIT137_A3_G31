@@ -24,7 +24,7 @@ class Tile:
         self.flipped_horizontal = not self.flipped_horizontal
 
     def toggle_vertical(self):
-        self.flipped_vertical !=  self.flipped_vertical
+        self.flipped_vertical = not self.flipped_vertical
 
     def  correctness(self):
         correct_position = (self.current_row == self.original_row and self.current_col == self.original_col)
@@ -36,4 +36,3 @@ class Tile:
             f"current=({self.current_row}, {self.current_col}), "
             f"rotation={self.rotation})")
 
-            
