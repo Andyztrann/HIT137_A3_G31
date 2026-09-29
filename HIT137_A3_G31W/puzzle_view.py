@@ -19,6 +19,7 @@ class PuzzleView:
         self.moves = tk.StringVar(value="Moves: 0")
         self.tiles_left = tk.StringVar(value="Tiles Left: 0")
         self.selected_image_path = None
+        self.on_photo_selected = None 
         self.original_photo = None
         self.puzzle_photo = None
        
@@ -137,7 +138,11 @@ class PuzzleView:
             print("Selected image:", file_path)
 
             if self.display_original_image(file_path):
-                self.set_hint_enabled(True)
+                if self.on_photo_selected is not None:
+                    self.on_photo_selected(
+                        file_path,
+                        int(self.grid_size.get()[0])
+                    )
     
     # Display the selected image            
     def display_original_image(self, file_path):

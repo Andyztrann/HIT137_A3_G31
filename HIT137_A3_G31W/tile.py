@@ -21,7 +21,7 @@ class Tile:
         self.rotation = (self.rotation + angle) % 360
 
     def toggle_horizontal_flip(self):
-        self.flipped_horizontal != self.flipped_horizontal
+        self.flipped_horizontal = not self.flipped_horizontal
 
     def toggle_vertical(self):
         self.flipped_vertical !=  self.flipped_vertical
