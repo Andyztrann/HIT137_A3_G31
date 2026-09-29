@@ -18,8 +18,8 @@ class ImageProcessor:
         height, width = image.shape[:2]
 
         scale = min(1.0, max_size / max(height, width))
-        new_width = int(width * scale)
-        new_height = int(height * scale)
+        new_width = max(1, int(width * scale))
+        new_height = max(1, int(height * scale))
 
         resized = cv2.resize(image, (new_width,new_height),interpolation = cv2.INTER_AREA)
 
