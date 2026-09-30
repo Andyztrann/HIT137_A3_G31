@@ -1,12 +1,13 @@
-# HIT137 Assignment 3
-# Owner: Andy
-# Purpose: Connect Model, Controller and View.
-
 import tkinter as tk
+
 from tkinter import messagebox
 
 import cv2
-from PIL import Image, ImageTk
+
+from PIL import (
+    Image,
+    ImageTk
+)
 
 from puzzle_model import PuzzleModel
 from puzzle_controller import PuzzleController
@@ -14,50 +15,50 @@ from puzzle_view import PuzzleView
 
 
 def main():
-
-    # ==========================================
-    # 1. CREATE AND CONNECT COMPONENTS
-    # ==========================================
-
     root = tk.Tk()
 
     model = PuzzleModel(3)
-    controller = PuzzleController(model)
-    view = PuzzleView(root)
 
-    view.controller = controller
+    controller = PuzzleController(
+        model
+    )
 
-    CANVAS_SIZE = 500
+    view = PuzzleView(
+        root
+    )
 
-    # ==========================================
-    # 2. DISPLAY IMAGES
-    # ==========================================
+    canvas_size = 500
 
     def convert_image(image):
-        """Convert an OpenCV image into a Pillow image."""
-
         rgb = cv2.cvtColor(
             image,
             cv2.COLOR_BGR2RGB
         )
 
-        result = Image.fromarray(rgb)
-
-        return result.resize(
-            (CANVAS_SIZE, CANVAS_SIZE)
+        return Image.fromarray(
+            rgb
+        ).resize(
+            (
+                canvas_size,
+                canvas_size
+            )
         )
 
     def display_original():
-        """Display the prepared original image."""
-
         if model.original_image is None:
             return
 
-        image = convert_image(model.original_image)
+        image = convert_image(
+            model.original_image
+        )
 
-        view.original_photo = ImageTk.PhotoImage(image)
+        view.original_photo = ImageTk.PhotoImage(
+            image
+        )
 
-        view.original_canvas.delete("all")
+        view.original_canvas.delete(
+            "all"
+        )
 
         view.original_canvas.create_image(
             250,
@@ -66,17 +67,15 @@ def main():
             anchor="center"
         )
 
-    # ==========================================
-    # 3. REFRESH THE GUI
-    # ==========================================
-
     def refresh(state):
+        view.update_moves(
+            state["moves"]
+        )
 
-        # Update counters.
-        view.update_moves(state["moves"])
-        view.update_tiles_left(state["tiles_left"])
+        view.update_tiles_left(
+            state["tiles_left"]
+        )
 
-        # Update the Hint button.
         view.set_hint_enabled(
             bool(model.tiles)
             and state["hints_remaining"] > 0
@@ -86,45 +85,51 @@ def main():
         if not model.tiles:
             return
 
-        # Rebuild and display the current puzzle.
-        puzzle = controller.get_puzzle_image()
+        puzzle_image = convert_image(
+            controller.get_puzzle_image()
+        )
 
-        puzzle_image = convert_image(puzzle)
+        view.display_puzzle_image(
+            puzzle_image
+        )
 
-        view.display_puzzle_image(puzzle_image)
         view.clear_hint_circles()
-
-        # Draw green ticks on correctly placed tiles.
         view.clear_correct_ticks()
 
         for tile in model.tiles:
-
             if tile.correctness():
-
                 view.draw_correct_tick(
                     tile.current_row,
                     tile.current_col
                 )
 
-        # Highlight the currently selected tile.
-        selected = state["selected_index"]
+        selected = state[
+            "selected_index"
+        ]
 
         if selected is not None:
-
             row, col = divmod(
                 selected,
                 model.grid_size
             )
 
-            view.highlight_selected_tile(row, col)
+            view.highlight_selected_tile(
+                row,
+                col
+            )
 
-        # Display hint circles.
         hint = state["hint"]
 
         if hint is not None:
+            (
+                current_row,
+                current_col
+            ) = hint["current"]
 
-            current_row, current_col = hint["current"]
-            home_row, home_col = hint["home"]
+            (
+                home_row,
+                home_col
+            ) = hint["home"]
 
             view.draw_hint_circles(
                 current_row,
@@ -133,98 +138,88 @@ def main():
                 home_col
             )
 
-    controller.on_change = refresh
-
-    # ==========================================
-    # 4. COMPLETION
-    # ==========================================
-
     def lock_puzzle():
-
         view.disable_puzzle_input()
 
-        # Additional macOS mouse bindings.
-        view.puzzle_canvas.unbind("<Button-2>")
-        view.puzzle_canvas.unbind("<Control-Button-1>")
+        view.puzzle_canvas.unbind(
+            "<Button-2>"
+        )
+
+        view.puzzle_canvas.unbind(
+            "<Control-Button-1>"
+        )
 
     def handle_completion():
-
         lock_puzzle()
 
         view.show_completion_message()
 
-    controller.on_complete = handle_completion
-
-    # ==========================================
-    # 5. MOUSE CONTROLS
-    # ==========================================
-
     def get_clicked_tile(event):
-        """Convert mouse coordinates into a tile index."""
-
-        if not model.tiles or controller.game_over:
-            return None
-
-        x = event.x
-        y = event.y
-
-        # Ignore clicks outside the puzzle.
-        if not (
-            0 <= x < CANVAS_SIZE
-            and 0 <= y < CANVAS_SIZE
+        if (
+            not model.tiles
+            or controller.game_over
         ):
             return None
 
-        # Calculate the selected tile.
-        col = x * model.grid_size // CANVAS_SIZE
-        row = y * model.grid_size // CANVAS_SIZE
+        if not (
+            0 <= event.x < canvas_size
+            and 0 <= event.y < canvas_size
+        ):
+            return None
 
-        index = row * model.grid_size + col
+        col = (
+            event.x
+            * model.grid_size
+            // canvas_size
+        )
 
-        return index
+        row = (
+            event.y
+            * model.grid_size
+            // canvas_size
+        )
+
+        return (
+            row
+            * model.grid_size
+            + col
+        )
 
     def handle_left_click(event):
-        """Select or swap tiles."""
+        index = get_clicked_tile(
+            event
+        )
 
-        index = get_clicked_tile(event)
-
-        if index is None:
-            return
-
-        controller.select_tile(index)
+        if index is not None:
+            controller.select_tile(
+                index
+            )
 
     def handle_right_click(event):
-        """Rotate the selected tile clockwise."""
+        index = get_clicked_tile(
+            event
+        )
 
-        index = get_clicked_tile(event)
-
-        if index is None:
-            return
-
-        controller.rotate_tile(index)
+        if index is not None:
+            controller.rotate_tile(
+                index
+            )
 
         return "break"
 
     def handle_shift_click(event):
-        """Flip the selected tile horizontally."""
-
-        index = get_clicked_tile(event)
+        index = get_clicked_tile(
+            event
+        )
 
         if index is not None:
+            controller.flip_tile(
+                index
+            )
 
-            controller.flip_tile(index)
-
-        # Prevent the normal left-click action.
         return "break"
 
     def bind_mouse_controls():
-        """
-        Connect mouse actions to the controller.
-
-        Call this AFTER loading an image because
-        reset_view() restores the original GUI bindings.
-        """
-
         canvas = view.puzzle_canvas
 
         canvas.bind(
@@ -242,7 +237,6 @@ def main():
             handle_shift_click
         )
 
-        # Alternative right-click bindings for macOS.
         canvas.bind(
             "<Button-2>",
             handle_right_click
@@ -253,29 +247,67 @@ def main():
             handle_right_click
         )
 
-    # ==========================================
-    # 6. HINT AND SOLVE BUTTONS
-    # ==========================================
-
     def handle_hint():
-
-        if not model.tiles:
-            return
-
-        controller.use_hint()
-
-        # The controller automatically calls refresh().
+        if model.tiles:
+            controller.use_hint()
 
     def handle_solve():
-
-        if not model.tiles:
-            return
-
-        if controller.solve():
-
+        if (
+            model.tiles
+            and controller.solve()
+        ):
             lock_puzzle()
 
-    # Connect buttons to the controller.
+    def handle_photo_selected(
+        file_path,
+        grid_size
+    ):
+        try:
+            controller.start_game(
+                file_path,
+                grid_size
+            )
+
+            view.selected_image_path = (
+                file_path
+            )
+
+            view.reset_view()
+
+            display_original()
+
+            refresh(
+                controller.get_state()
+            )
+
+            bind_mouse_controls()
+
+        except (
+            ValueError,
+            OSError,
+            cv2.error
+        ) as error:
+            messagebox.showerror(
+                "Image Error",
+                str(error)
+            )
+
+    def handle_grid_changed(grid_size):
+        if (
+            view.selected_image_path
+            is not None
+        ):
+            handle_photo_selected(
+                view.selected_image_path,
+                grid_size
+            )
+
+    controller.on_change = refresh
+
+    controller.on_complete = (
+        handle_completion
+    )
+
     view.hint_button.config(
         command=handle_hint
     )
@@ -284,47 +316,15 @@ def main():
         command=handle_solve
     )
 
-    # ==========================================
-    # 7. LOAD IMAGE AND START THE GAME
-    # ==========================================
+    view.on_photo_selected = (
+        handle_photo_selected
+    )
 
-    def handle_photo_selected(file_path, grid_size):
+    view.on_grid_changed = (
+        handle_grid_changed
+    )
 
-        try:
-
-            # Load, split and scramble the image.
-            controller.start_game(
-                file_path,
-                grid_size
-            )
-
-            # Display the prepared original image.
-            display_original()
-
-            # Display the scrambled puzzle.
-            refresh(controller.get_state())
-
-            # IMPORTANT:
-            # Reconnect mouse handlers AFTER
-            # Naro's reset_view() has executed.
-            bind_mouse_controls()
-
-        except (ValueError, OSError, cv2.error) as error:
-
-            messagebox.showerror(
-                "Image Error",
-                str(error)
-            )
-
-    # Connect Naro's photo selection callback.
-    view.on_photo_selected = handle_photo_selected
-
-    # Initial mouse bindings.
     bind_mouse_controls()
-
-    # ==========================================
-    # 8. START APPLICATION
-    # ==========================================
 
     root.mainloop()
 

@@ -1,12 +1,33 @@
-# HIT137 Assignment 3 — Group 31
+# HIT137 Assignment 3 - Group 31
 
-## Team roles
+Image Puzzle Game
 
-- **Vinh** — Core Model + Image Processing
-- **Andy** — Controller + Transformations + Gameplay
-- **Naro** — Tkinter View + Visual Feedback + Testing
+This project is a Python desktop image puzzle game developed for HIT137 Software Now Assignment 3.
 
-## Shared structure
+The program loads an image, divides it into a 3x3, 4x4 or 5x5 grid, randomly scrambles the tiles using swaps, rotations and flips, and allows the player to restore the original image.
+
+## Team Members
+
+Vinh - Core Model and Image Processing
+Developed the tile and puzzle model, image loading, resizing, padding, splitting and rebuilding functions.
+
+Andy - Controller, Transformations and Gameplay
+Developed the transformation classes, scrambling, player actions, hints, Solve logic, completion detection and application integration.
+
+Naro - Tkinter GUI, Visual Feedback and Testing
+Developed the Tkinter interface, image canvases, grid display, selection feedback, correct-tile indicators and hint visuals.
+
+## Project Structure
+
+The project follows this structure:
+
+Model / Image Processing
+↓
+Controller / Gameplay Logic
+↓
+View / Tkinter GUI
+
+Main files:
 
 ```text
 HIT137_A3_G31/
@@ -17,38 +38,8 @@ HIT137_A3_G31/
 ├── transformations.py
 ├── puzzle_controller.py
 ├── puzzle_view.py
-├── test_images/
+├── test_controller.py
+├── test_transformations.py
+├── requirements.txt
 ├── README.md
-├── github_link.txt
-└── .gitignore
-```
-
-## Architecture
-
-**Model / Image Engine → Controller / Game Logic → View / GUI**
-
-- Vinh owns the Model and image-processing layer.
-- Andy owns the Controller, transformations and gameplay logic.
-- Naro owns the Tkinter View and visual feedback.
-- `main.py` is the shared application entry point, coordinated by Andy.
-
-## Working rules
-
-1. Pull before starting work.
-2. Work mainly in your assigned files.
-3. Commit your own work regularly.
-4. Push small, meaningful changes.
-5. Tell the group before changing another member's shared interface.
-6. Integrate and test together.
-
-## Internal deadlines
-
-- **18 Sep** — structure, GitHub and shared interfaces agreed
-- **23 Sep** — individual core sections ready
-- **24 Sep** — first integration
-- **26 Sep** — all required features complete
-- **28 Sep** — testing complete / code freeze
-- **29 Sep** — final rubric audit
-- **30 Sep** — target early submission
-- **1–2 Oct** — buffer only
-- **2 Oct** — official deadline
+└── github_link.txt
