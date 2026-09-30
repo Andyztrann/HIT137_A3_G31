@@ -1,22 +1,27 @@
 import numpy as np
 
-class Tile:"""Represents one image tile in the puzzle."""
+
+class Tile:
+    """Represents one image tile and its current puzzle state."""
+
     def __init__(self, image, original_row, original_col):
         self.original_image = image.copy()
         self.image = image.copy()
+
         self.original_row = original_row
-        self.original_col = original_col 
+        self.original_col = original_col
+
         self.current_row = original_row
         self.current_col = original_col
 
-        self.rotation = 0 
+        self.rotation = 0
         self.flipped_horizontal = False
         self.flipped_vertical = False
 
     def set_position(self, row, col):
         """Update the current position of the tile."""
-        self.current_row  = row
-        self.current_col  = col
+        self.current_row = row
+        self.current_col = col
 
     def add_rotation(self, angle):
         """Update the stored rotation angle."""
@@ -30,14 +35,35 @@ class Tile:"""Represents one image tile in the puzzle."""
         """Toggle the vertical flip state."""
         self.flipped_vertical = not self.flipped_vertical
 
-    def  correctness(self):
+    def restore(self):
+        """Restore the tile to its original position and orientation."""
+        self.set_position(
+            self.original_row,
+            self.original_col
+        )
+
+        self.image = self.original_image.copy()
+        self.rotation = 0
+        self.flipped_horizontal = False
+        self.flipped_vertical = False
+
+    def correctness(self):
         """Return True when the tile is in its correct state."""
-        correct_position = (self.current_row == self.original_row and self.current_col == self.original_col)
-        correct_orientation = np.array_equal(self.image, self.original_image)
-        return correct_orientation and correct_position
+        correct_position = (
+            self.current_row == self.original_row
+            and self.current_col == self.original_col
+        )
+
+        correct_orientation = np.array_equal(
+            self.image,
+            self.original_image
+        )
+
+        return correct_position and correct_orientation
 
     def __repr__(self):
-        return (f"Tile(original=({self.original_row}, {self.original_col}), "
+        return (
+            f"Tile(original=({self.original_row}, {self.original_col}), "
             f"current=({self.current_row}, {self.current_col}), "
-            f"rotation={self.rotation})")
-
+            f"rotation={self.rotation})"
+        )

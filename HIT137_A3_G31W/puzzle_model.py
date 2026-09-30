@@ -1,4 +1,5 @@
-class PuzzleModel:"""Stores and manages the current puzzle state."""
+class PuzzleModel:
+    """Stores and manages the current puzzle state."""
 
     def __init__(self, grid_size=3):
 
