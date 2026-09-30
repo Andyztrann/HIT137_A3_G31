@@ -1,98 +1,138 @@
-from transformations import SwapTransformation
+import cv2
+import numpy as np
 
-
-class FakeModel:
-    def __init__(self):
-        self.tiles = ["A", "B", "C"]
-
-
-model = FakeModel()
-
-swap = SwapTransformation(0, 2)
-swap.apply(model)
-
-print(model.tiles)
-
-from transformations import RotateTransformation
-
-class FakeTile:
-    def __init__(self):
-        self.rotation = 0
-        self.flipped_horizontal = False
-        self.flipped_vertical = False
-
-model.tiles = [FakeTile()]
-
-rotate = RotateTransformation(0, 90)
-
-rotate.apply(model)
-print(model.tiles[0].rotation)
-
-rotate.apply(model)
-print(model.tiles[0].rotation)
-
-from transformations import FlipTransformation
-
-tile = model.tiles[0]
-
-tile.flipped_horizontal = False
-tile.flipped_vertical = False
-
-flip = FlipTransformation(0, "horizontal")
-
-flip.apply(model)
-print(tile.flipped_horizontal, tile.flipped_vertical)
-
-flip.apply(model)
-print(tile.flipped_horizontal, tile.flipped_vertical)
-
+from image_processor import ImageProcessor
+from puzzle_model import PuzzleModel
 from puzzle_controller import PuzzleController
 
-model.tiles = ["A", "B", "C"]
+from transformations import (
+    SwapTransformation,
+    RotateTransformation,
+    FlipTransformation
+)
+
+
+# Create a real puzzle model for testing.
+def make_model(size):
+
+    rng = np.random.default_rng(42 + size)
+
+    image = rng.integers(
+        0,
+        256,
+        size=(size * 10, size * 10, 3),
+        dtype=np.uint8
+    )
+
+    processor = ImageProcessor()
+
+    tiles = processor.split_image(image, size)
+
+    model = PuzzleModel(size)
+
+    model.load_puzzle(image, tiles)
+
+    return model
+
+
+# TEST 1: Swapping
+model = make_model(3)
+
+first = model.get_tile(0, 0)
+second = model.get_tile(0, 1)
 
 controller = PuzzleController(model)
 
-controller.swap_tiles(0, 2)
-controller.swap_tiles(1, 1)
+assert controller.swap_tiles(0, 1)
 
-print(model.tiles)
-print("Moves:", controller.moves)
+assert model.get_tile(0, 0) is second
+assert model.get_tile(0, 1) is first
 
-# Test scrambling
-# Test all three grid sizes
+assert controller.moves == 1
+
+# Swapping the same position must not count.
+assert not controller.swap_tiles(1, 1)
+assert controller.moves == 1
+
+print("Swap: PASSED")
+
+
+# TEST 2: Rotation
+RotateTransformation(0, 90).apply(model)
+
+expected_image = cv2.rotate(
+    second.original_image,
+    cv2.ROTATE_90_CLOCKWISE
+)
+
+assert np.array_equal(second.image, expected_image)
+
+print("Rotation: PASSED")
+
+
+# TEST 3: Flipping
+FlipTransformation(0, "horizontal").apply(model)
+
+expected_image = cv2.flip(
+    expected_image,
+    1
+)
+
+assert np.array_equal(second.image, expected_image)
+
+print("Flip: PASSED")
+
+
+# TEST 4: Restore the original orientation
+FlipTransformation(0, "horizontal").apply(model)
+RotateTransformation(0, 270).apply(model)
+
+assert np.array_equal(
+    second.image,
+    second.original_image
+)
+
+print("Orientation restoration: PASSED")
+
+
+# TEST 5: Scrambling all grid sizes
+expected_counts = {
+    3: 6,
+    4: 12,
+    5: 20
+}
+
 for size in [3, 4, 5]:
-    print(f"\nTesting {size}x{size}")
 
-    model.tiles = [
-        FakeTile() for _ in range(size * size)
-    ]
+    model = make_model(size)
+
+    assert model.count_incorrect() == 0
 
     controller = PuzzleController(model)
+
     controller.scramble(size)
 
-    print("Player moves:", controller.moves)
-    
-    print("Rotated tiles:", sum(
-    tile.rotation != 0 for tile in model.tiles
-    ))
-
-    print("Flipped tiles:", sum(
-        tile.flipped_horizontal or tile.flipped_vertical
-        for tile in model.tiles
-    ))
-    
-    expected = {3: 6, 4: 12, 5: 20}
-
-    rotated = sum(
-        tile.rotation != 0 for tile in model.tiles
-    )
-
-    flipped = sum(
-        tile.flipped_horizontal or tile.flipped_vertical
-        for tile in model.tiles
-    )
-
-    assert rotated + flipped == expected[size] - 1
+    # Scrambling must not count as player moves.
     assert controller.moves == 0
 
-    print("TEST PASSED")
+    # One swap affects two positions.
+    # Each remaining transformation affects one.
+    expected_affected = expected_counts[size] + 1
+
+    assert model.count_incorrect() == expected_affected
+
+    # Check that the resulting puzzle can be rebuilt.
+    processor = ImageProcessor()
+
+    rebuilt = processor.rebuild_image(
+        model.tiles,
+        size
+    )
+
+    assert rebuilt.shape == model.original_image.shape
+
+    print(f"{size}x{size} scrambling: PASSED")
+
+
+print("\nALL INTEGRATION TESTS PASSED")
+
