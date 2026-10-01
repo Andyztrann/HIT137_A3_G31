@@ -43,6 +43,7 @@ HIT137_A3_G31/
 ├── requirements.txt
 ├── README.md
 └── github_link.txt
+```
 
 ## Controls
 Left click - Select a tile
