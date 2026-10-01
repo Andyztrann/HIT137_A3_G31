@@ -43,3 +43,18 @@ HIT137_A3_G31/
 ├── requirements.txt
 ├── README.md
 └── github_link.txt
+
+## Controls
+Left click - Select a tile
+
+Left click another tile - Swap the two tiles
+
+Left click the selected tile again - Deselect it
+
+Right click - Rotate the tile 90 degrees clockwise
+
+Shift + Left click - Flip the tile horizontally
+
+Hint - Show a hint for one incorrect tile
+
+Solve - Automatically restore the puzzle
